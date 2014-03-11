@@ -44,6 +44,10 @@
 	return [[MWPhoto alloc] initWithURL:url];
 }
 
++ (MWPhoto *)photoWithURL:(NSURL *)url placeHolder:(UIImage *)placeHolder{
+	return [[MWPhoto alloc] initWithURL:url placeHolder:placeHolder];
+}
+
 #pragma mark - Init
 
 - (id)initWithImage:(UIImage *)image {
@@ -62,8 +66,13 @@
 }
 
 - (id)initWithURL:(NSURL *)url {
+    return [self initWithURL:url placeHolder:Nil];
+}
+
+- (id)initWithURL:(NSURL *)url placeHolder:(UIImage *)placeHolder{
 	if ((self = [super init])) {
 		_photoURL = [url copy];
+        _placeHolder = placeHolder;
 	}
 	return self;
 }
