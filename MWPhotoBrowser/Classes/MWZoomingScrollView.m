@@ -10,7 +10,6 @@
 #import "MWZoomingScrollView.h"
 #import "MWPhotoBrowser.h"
 #import "MWPhoto.h"
-#import "DACircularProgressView.h"
 #import "MWPhotoBrowserPrivate.h"
 
 // Private methods and properties
@@ -19,7 +18,8 @@
     MWPhotoBrowser __weak *_photoBrowser;
 	MWTapDetectingView *_tapView; // for background taps
 	MWTapDetectingImageView *_photoImageView;
-	DACircularProgressView *_loadingIndicator;
+//	DACircularProgressView *_loadingIndicator;
+    id<MWProgressView> _progressView;
     UIImageView *_loadingError;
     
 }
@@ -50,18 +50,15 @@
 		[self addSubview:_photoImageView];
 		
 		// Loading indicator
-		_loadingIndicator = [[DACircularProgressView alloc] initWithFrame:CGRectMake(140.0f, 30.0f, 40.0f, 40.0f)];
-        _loadingIndicator.userInteractionEnabled = NO;
-        if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7")) {
-            _loadingIndicator.thicknessRatio = 0.1;
-            _loadingIndicator.roundedCorners = NO;
+        if (browser.progressView) {
+            _progressView = browser.progressView;
         } else {
-            _loadingIndicator.thicknessRatio = 0.2;
-            _loadingIndicator.roundedCorners = YES;
+            _progressView = [[MWProgressView alloc] initWithFrame:CGRectMake(140.0f, 30.0f, 40.0f, 40.0f)];
         }
-		_loadingIndicator.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-        UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-		[self addSubview:_loadingIndicator];
+        
+        _progressView.tapDelegate = self;
+        
+        [self addSubview:[_progressView progressView]];
 
         // Listen progress notifications
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -192,20 +189,22 @@
     id <MWPhoto> photoWithProgress = [dict objectForKey:@"photo"];
     if (photoWithProgress == self.photo) {
         float progress = [[dict valueForKey:@"progress"] floatValue];
-        _loadingIndicator.progress = MAX(MIN(1, progress), 0);
+        _progressView.progress = (MAX(MIN(1, progress), 0));
     }
 }
 
 - (void)hideLoadingIndicator {
-    _loadingIndicator.hidden = YES;
+    _progressView.hidden = YES;
 }
 
 - (void)showLoadingIndicator {
     self.zoomScale = 0;
     self.minimumZoomScale = 0;
     self.maximumZoomScale = 0;
-    _loadingIndicator.progress = 0;
-    _loadingIndicator.hidden = NO;
+    
+    _progressView.progress = 0;
+    _progressView.hidden = NO;
+    
     [self hideImageFailure];
 }
 
@@ -294,11 +293,11 @@
 	_tapView.frame = self.bounds;
 	
 	// Position indicators (centre does not seem to work!)
-	if (!_loadingIndicator.hidden)
-        _loadingIndicator.frame = CGRectMake(floorf((self.bounds.size.width - _loadingIndicator.frame.size.width) / 2.),
-                                         floorf((self.bounds.size.height - _loadingIndicator.frame.size.height) / 2),
-                                         _loadingIndicator.frame.size.width,
-                                         _loadingIndicator.frame.size.height);
+	if (!_progressView.hidden)
+        _progressView.progressViewFrame = CGRectMake(floorf((self.bounds.size.width - _progressView.progressViewFrame.size.width) / 2.),
+                                         floorf((self.bounds.size.height - _progressView.progressViewFrame.size.height) / 2),
+                                         _progressView.progressViewFrame.size.width,
+                                         _progressView.progressViewFrame.size.height);
 	if (_loadingError)
         _loadingError.frame = CGRectMake(floorf((self.bounds.size.width - _loadingError.frame.size.width) / 2.),
                                          floorf((self.bounds.size.height - _loadingError.frame.size.height) / 2),
@@ -381,6 +380,11 @@
 	// Delay controls
 	[_photoBrowser hideControlsAfterDelay];
 	
+}
+
+// Progress View
+- (void)progressView:(UIView *)progressView singleTapDetected:(UITouch *)touch {
+    [self handleSingleTap:CGPointZero];
 }
 
 // Image View

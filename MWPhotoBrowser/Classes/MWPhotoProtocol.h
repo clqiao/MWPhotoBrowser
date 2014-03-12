@@ -54,6 +54,7 @@
 
 @optional
 
+// ImageView placeholder
 @property (nonatomic, strong) UIImage *placeholderImage;
 
 // Return a caption string to be displayed over the image

@@ -10,10 +10,11 @@
 #import "MWPhotoProtocol.h"
 #import "MWTapDetectingImageView.h"
 #import "MWTapDetectingView.h"
+#import "MWProgressViewProtocol.h"
 
 @class MWPhotoBrowser, MWPhoto, MWCaptionView;
 
-@interface MWZoomingScrollView : UIScrollView <UIScrollViewDelegate, MWTapDetectingImageViewDelegate, MWTapDetectingViewDelegate> {
+@interface MWZoomingScrollView : UIScrollView <UIScrollViewDelegate, MWTapDetectingImageViewDelegate, MWTapDetectingViewDelegate, MWTapDetectingProgressViewDelegate> {
 
 }
 
