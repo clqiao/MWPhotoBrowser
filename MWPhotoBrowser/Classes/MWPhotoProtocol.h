@@ -54,6 +54,8 @@
 
 @optional
 
+@property (nonatomic, strong) UIImage *placeholderImage;
+
 // Return a caption string to be displayed over the image
 // Return nil to display no caption
 - (NSString *)caption;

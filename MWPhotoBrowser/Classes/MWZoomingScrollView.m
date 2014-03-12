@@ -109,8 +109,8 @@
         [self displayImage];
     } else {
         // display image placeholder
-        if (((MWPhoto *)_photo).placeHolder)
-            _photoImageView.image = ((MWPhoto *)_photo).placeHolder;
+        if (_photo.placeholderImage)
+            _photoImageView.image = _photo.placeholderImage;
         
         // Will be loading so show loading
         [self showLoadingIndicator];
@@ -120,7 +120,7 @@
 // Get and display image
 - (void)displayImage {
 	if (_photo &&
-        ((_photoImageView.image == nil) || (_photoImageView.image == ((MWPhoto *)_photo).placeHolder))) {
+        ((_photoImageView.image == nil) || (_photoImageView.image == _photo.placeholderImage))) {
 		
 		// Reset
 		self.maximumZoomScale = 1;

@@ -28,6 +28,7 @@
 @implementation MWPhoto
 
 @synthesize underlyingImage = _underlyingImage; // synth property from protocol
+@synthesize placeholderImage = _placeholderImage; // synth property from protocol
 
 #pragma mark - Class Methods
 
@@ -44,8 +45,8 @@
 	return [[MWPhoto alloc] initWithURL:url];
 }
 
-+ (MWPhoto *)photoWithURL:(NSURL *)url placeHolder:(UIImage *)placeHolder{
-	return [[MWPhoto alloc] initWithURL:url placeHolder:placeHolder];
++ (MWPhoto *)photoWithURL:(NSURL *)url placeholder:(UIImage *)placeholder{
+	return [[MWPhoto alloc] initWithURL:url placeholder:placeholder];
 }
 
 #pragma mark - Init
@@ -66,13 +67,13 @@
 }
 
 - (id)initWithURL:(NSURL *)url {
-    return [self initWithURL:url placeHolder:Nil];
+    return [self initWithURL:url placeholder:Nil];
 }
 
-- (id)initWithURL:(NSURL *)url placeHolder:(UIImage *)placeHolder{
+- (id)initWithURL:(NSURL *)url placeholder:(UIImage *)placeholder{
 	if ((self = [super init])) {
 		_photoURL = [url copy];
-        _placeHolder = placeHolder;
+        self.placeholderImage = placeholder;
 	}
 	return self;
 }
