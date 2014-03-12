@@ -11,6 +11,7 @@
 #import "MWPhotoBrowser.h"
 #import "MWPhoto.h"
 #import "MWPhotoBrowserPrivate.h"
+#import "MWProgressView.h"
 
 // Private methods and properties
 @interface MWZoomingScrollView () {
@@ -53,7 +54,8 @@
         if (browser.progressView) {
             _progressView = browser.progressView;
         } else {
-            _progressView = [[MWProgressView alloc] initWithFrame:CGRectMake(140.0f, 30.0f, 40.0f, 40.0f)];
+            MWProgressView* internalProgressView = [[MWProgressView alloc] initWithFrame:CGRectMake(140.0f, 30.0f, 40.0f, 40.0f)];
+            _progressView = internalProgressView;
         }
         
         _progressView.tapDelegate = self;
@@ -268,6 +270,11 @@
 	self.maximumZoomScale = maxScale;
 	self.minimumZoomScale = minScale;
     
+    // if downloading image set zooming disable
+    if (!_progressView.hidden) {
+        self.maximumZoomScale = minScale;
+    }
+    
     // Initial zoom
     self.zoomScale = [self initialZoomScaleWithMinScale];
     
@@ -334,7 +341,7 @@
 #pragma mark - UIScrollViewDelegate
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-	return _photoImageView;
+    return _photoImageView;
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
