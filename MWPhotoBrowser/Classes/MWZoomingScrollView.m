@@ -12,6 +12,7 @@
 #import "MWPhoto.h"
 #import "MWPhotoBrowserPrivate.h"
 #import "MWProgressView.h"
+#import "MWLoadFailView.h"
 
 // Private methods and properties
 @interface MWZoomingScrollView () {
@@ -19,9 +20,8 @@
     MWPhotoBrowser __weak *_photoBrowser;
 	MWTapDetectingView *_tapView; // for background taps
 	MWTapDetectingImageView *_photoImageView;
-//	DACircularProgressView *_loadingIndicator;
     id<MWProgressView> _progressView;
-    UIImageView *_loadingError;
+    MWLoadFailView *_loadFailView;
     
 }
 
@@ -61,7 +61,7 @@
         _progressView.tapDelegate = self;
         
         [self addSubview:[_progressView progressView]];
-
+        
         // Listen progress notifications
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(setProgressFromNotification:)
@@ -161,26 +161,23 @@
 // Image failed so just show black!
 - (void)displayImageFailure {
     [self hideLoadingIndicator];
-    _photoImageView.image = nil;
-    if (!_loadingError) {
-        _loadingError = [UIImageView new];
-        _loadingError.image = [UIImage imageNamed:@"MWPhotoBrowser.bundle/images/ImageError.png"];
-        _loadingError.userInteractionEnabled = NO;
-		_loadingError.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin |
-        UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleRightMargin;
-        [_loadingError sizeToFit];
-        [self addSubview:_loadingError];
+    
+    // when download image fail, do not set to nil if there is a placeholder
+    if (_photoImageView.image != _photo.placeholderImage)
+        _photoImageView.image = nil;
+    
+    if (!_loadFailView) {
+        _loadFailView = [[MWLoadFailView alloc] initWithFrame:self.bounds];
+        _loadFailView.tapDelegate = self;
+        [self addSubview:_loadFailView];
     }
-    _loadingError.frame = CGRectMake(floorf((self.bounds.size.width - _loadingError.frame.size.width) / 2.),
-                                     floorf((self.bounds.size.height - _loadingError.frame.size.height) / 2),
-                                     _loadingError.frame.size.width,
-                                     _loadingError.frame.size.height);
 }
 
 - (void)hideImageFailure {
-    if (_loadingError) {
-        [_loadingError removeFromSuperview];
-        _loadingError = nil;
+    
+    if (_loadFailView) {
+        [_loadFailView removeFromSuperview];
+        _loadFailView = nil;
     }
 }
 
@@ -305,11 +302,6 @@
                                          floorf((self.bounds.size.height - _progressView.progressViewFrame.size.height) / 2),
                                          _progressView.progressViewFrame.size.width,
                                          _progressView.progressViewFrame.size.height);
-	if (_loadingError)
-        _loadingError.frame = CGRectMake(floorf((self.bounds.size.width - _loadingError.frame.size.width) / 2.),
-                                         floorf((self.bounds.size.height - _loadingError.frame.size.height) / 2),
-                                         _loadingError.frame.size.width,
-                                         _loadingError.frame.size.height);
 
 	// Super
 	[super layoutSubviews];
@@ -360,7 +352,7 @@
 #pragma mark - Tap Detection
 
 - (void)handleSingleTap:(CGPoint)touchPoint {
-	[_photoBrowser performSelector:@selector(toggleControls) withObject:nil afterDelay:0.2];
+	[_photoBrowser performSelector:@selector(toggleControls) withObject:nil afterDelay:0.];
 }
 
 - (void)handleDoubleTap:(CGPoint)touchPoint {
@@ -387,11 +379,6 @@
 	// Delay controls
 	[_photoBrowser hideControlsAfterDelay];
 	
-}
-
-// Progress View
-- (void)progressView:(UIView *)progressView singleTapDetected:(UITouch *)touch {
-    [self handleSingleTap:CGPointZero];
 }
 
 // Image View

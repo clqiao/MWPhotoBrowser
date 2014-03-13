@@ -7,14 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MWTapDetectingViewProtocol.h"
 
-@protocol MWTapDetectingProgressViewDelegate <NSObject>
-
-@optional
-
-- (void)progressView:(UIView *)progressView singleTapDetected:(UITouch *)touch;
-
-@end
 
 @protocol MWProgressView <NSObject>
 
@@ -28,6 +22,6 @@
 
 @optional
 
-@property (nonatomic, weak) id <MWTapDetectingProgressViewDelegate> tapDelegate;
+@property (nonatomic, weak) id <MWTapDetectingViewDelegate> tapDelegate;
 
 @end

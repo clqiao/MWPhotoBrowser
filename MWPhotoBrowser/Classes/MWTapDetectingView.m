@@ -7,6 +7,7 @@
 //
 
 #import "MWTapDetectingView.h"
+#import "MWTapDetectingViewProtocol.h"
 
 @implementation MWTapDetectingView
 
