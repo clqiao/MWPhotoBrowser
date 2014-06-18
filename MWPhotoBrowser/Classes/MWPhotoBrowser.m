@@ -1304,6 +1304,8 @@
 
         // Nav bar slides up on it's own on iOS 7
         [self.navigationController.navigationBar setAlpha:alpha];
+        // resolve navigation bar disappear for ever bug
+        [self.navigationController.navigationBar setHidden:NO];
         
         // Toolbar
         if (slideAndFade) {
